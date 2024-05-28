@@ -1,0 +1,35 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main # main 브랜치에 푸시될 때마다 실행
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3 # 최신 버전 사용
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "22.2.0" # 사용 중인 Node.js 버전으로 변경
+          cache: "npm" # 동일한 의존성의 경우 npm 캐시 사용
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
+      - name: Export static files
+        run: npm run export
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }} # 깃헙에서 자동으로 토큰 생성함
+          publish_dir: ./out # out 디렉토리의 파일이 지정된 브랜치(gh-pages)의 루트 디렉토리로 배포된다.
